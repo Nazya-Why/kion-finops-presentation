@@ -235,6 +235,60 @@ body.lt #ui{color:var(--ink-l)}
 .list li{align-items:flex-start}
 .list li .dot,.dark .list li .dot,.light .list li .dot{width:34px;height:34px;background:none;margin-top:-1px;display:block}
 .list li .dot svg{width:34px;height:34px}
+
+/* ================= PHONE LAYOUT (touch devices only; desktop untouched) ================= */
+html.m,html.m body{overflow-x:hidden;overflow-y:auto;height:auto}
+.m #deck{position:relative;inset:auto;overflow:visible}
+.m .slide{position:relative;inset:auto;min-height:100svh;display:flex;flex-direction:column;justify-content:center;transform:none!important;visibility:visible!important;will-change:auto}
+.m .stage{position:relative;left:auto;top:auto;width:auto;height:auto;transform:none!important;zoom:var(--mz,.75);padding:100px 22px 84px;display:flex;flex-direction:column;gap:28px}
+.m .stage > .a{position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:auto!important;height:auto!important;margin:0!important}
+.m .stage > svg.a{display:none}
+.m .stage > .a[style*="justify-content:space-between"]{flex-direction:column;align-items:flex-start!important;gap:24px}
+.m .stage > .a[style*="grid-template-columns"]{grid-template-columns:1fr!important;grid-auto-rows:auto!important}
+.m .stage > .a:has(> .stat),.m .stage > .a:has(> .big-stat),.m .stage > .a:has(> .cr),.m .stage > .a:has(> .phase),.m .stage > .a:has(> .tree-node){grid-template-columns:1fr 1fr!important;gap:16px!important}
+.m .h1{font-size:104px!important}
+.m .h2{font-size:52px!important;line-height:1.06}
+.m .lead{font-size:24px!important}
+.m .stat .num{font-size:62px}
+.m .big-stat .num{font-size:54px}
+.m .big-stat{padding:26px 22px}
+.m [style*="font-size:150px"],.m [style*="font-size:132px"]{font-size:88px!important}
+.m .chip{white-space:normal}
+.m .note{width:auto!important}
+.m .card{padding:26px 24px}
+.m #dots,.m #hint{display:none}
+.m .fig .zoomhint{opacity:1;transform:none}
+.m .stage > .a > .r.small[style*="grid-template-columns"]{display:none}
+.m .prob{grid-template-columns:44px 1fr;row-gap:10px}
+.m .prob .arrow{display:none}
+.m .prob > span:last-child{grid-column:2}
+.m .stage > .a:has(.tbl),.m .stage > .a:has(.gantt){overflow-x:auto;-webkit-overflow-scrolling:touch}
+.m .tbl{min-width:1250px}
+.m .stage > .a:has(.gantt) > div{min-width:960px}
+.m .gantt,.m .gl-lines{grid-template-columns:210px repeat(9,1fr)!important}
+.m .bar-track{margin-right:22px}
+.m .glass > .a{display:none}
+.m .bt{padding:22px 22px 16px}
+.m .bt .row{font-size:17px}
+.m .bt .row[style*="1fr 110px"]{grid-template-columns:1fr 56px 52px 88px!important}
+.m .stack,.m .leg{width:auto!important}
+.m .risk-h{display:none}
+.m .risk{grid-template-columns:44px 1fr;row-gap:12px;padding:22px 22px}
+.m .risk > span:nth-child(3),.m .risk .fix{grid-column:2}
+.m .stage > .a:has(.donut){height:auto!important;flex-direction:column;align-items:flex-start}
+.m .stage > .a:has(.bar-track){margin-top:70px!important}
+.m .mark .v{font-size:21px}
+.m .creds{flex-wrap:wrap;row-gap:20px}
+.m .cred{padding:0 28px}
+.m .list li{font-size:21px}
+.m .stage > .a > .r.small[style*="display:grid"]{display:none!important}
+.m .stage > .a:has(.donut){align-items:flex-start!important}
+.m .bt .row.th{font-size:10px;letter-spacing:.05em}
+.m #brand{display:none}
+.m #count{padding:7px 14px;border-radius:999px;background:rgba(20,16,40,.5);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#fff}
+body.lt.m #count{background:rgba(255,255,255,.65);color:#1d1d1f}
+.m .creds{flex-direction:column}
+.m .cred,.m .cred:first-child{padding:0;border-left:0}
 </style>
 </head>
 <body>
@@ -846,6 +900,8 @@ body.lt #ui{color:var(--ink-l)}
 
 <script>
 (()=>{
+const MOBILE=matchMedia('(hover: none) and (pointer: coarse) and (max-width: 1000px)').matches||/[?&]mobile/.test(location.search);
+if(MOBILE){document.documentElement.classList.add('m');document.body.classList.add('m');}
 /* =====================================================================
    1. LIQUID BACKGROUND — WebGL2 fragment shader
    ===================================================================== */
@@ -990,7 +1046,7 @@ function glassFilter(w,h,r,scale){
   defs.appendChild(f);fcache.set(key,id);return id;
 }
 function applyGlass(){
-  if(!isChromium)return;
+  if(!isChromium||MOBILE)return;
   document.querySelectorAll('.glass').forEach(el=>{
     const w=el.offsetWidth,h=el.offsetHeight;if(!w||!h)return;
     const r=parseFloat(getComputedStyle(el).borderTopLeftRadius)||0;
@@ -1036,7 +1092,9 @@ function runCounters(s){
 }
 function activate(i){const s=slides[i];if(!s.classList.contains('on')){s.classList.add('on');runCounters(s);}}
 function go(i){
-  i=Math.max(0,Math.min(N-1,i));if(i===cur&&!tw)return;
+  i=Math.max(0,Math.min(N-1,i));
+  if(MOBILE){slides[i].scrollIntoView({behavior:'smooth'});return;}
+  if(i===cur&&!tw)return;
   const dist=Math.abs(i-pos);
   tw={from:pos,to:i,t0:performance.now(),dur:Math.min(1900,950+260*Math.max(0,dist-1))};
   cur=i;setTimeout(()=>{if(cur===i)activate(i);},Math.min(420,tw.dur*.32));
@@ -1047,7 +1105,7 @@ function go(i){
 /* input */
 let wheelBlockUntil=0,lastWheel=0,acc=0;
 addEventListener('wheel',e=>{
-  e.preventDefault();if(lbOpen)return;
+  if(MOBILE)return;e.preventDefault();if(lbOpen)return;
   const now=performance.now(),gap=now-lastWheel;lastWheel=now;
   if(now<wheelBlockUntil||(gap<160&&tw)){wheelBlockUntil=Math.max(wheelBlockUntil,now+120);return;}
   acc+=e.deltaY;
@@ -1063,7 +1121,7 @@ addEventListener('keydown',e=>{
 });
 let ty=null;
 addEventListener('touchstart',e=>{ty=e.touches[0].clientY;},{passive:true});
-addEventListener('touchend',e=>{if(ty==null||lbOpen)return;const dy=ty-e.changedTouches[0].clientY;if(Math.abs(dy)>50)go(cur+(dy>0?1:-1));ty=null;});
+addEventListener('touchend',e=>{if(MOBILE||ty==null||lbOpen)return;const dy=ty-e.changedTouches[0].clientY;if(Math.abs(dy)>50)go(cur+(dy>0?1:-1));ty=null;});
 let mx=0,my=0,smx=0,smy=0;
 addEventListener('pointermove',e=>{mx=e.clientX/innerWidth*2-1;my=-(e.clientY/innerHeight*2-1);});
 
@@ -1079,7 +1137,26 @@ lb.addEventListener('mousemove',e=>{if(!lb.classList.contains('zoom'))return;
 
 /* layout */
 let S=1;
-function layout(){S=Math.min(innerWidth/1920,innerHeight/1080);resizeGL();}
+function layout(){S=Math.min(innerWidth/1920,innerHeight/1080);
+  if(MOBILE){document.documentElement.style.setProperty('--mz',(innerWidth<600?innerWidth/520:innerWidth/860).toFixed(3));setTimeout(measureM,50);}
+  resizeGL();}
+/* phone: position in the deck comes from the page scroll */
+let mTops=[],mH=[];
+function measureM(){mTops=slides.map(s=>s.offsetTop);mH=slides.map(s=>s.offsetHeight);}
+function mobilePos(){
+  if(mTops.length!==N)measureM();
+  const y=scrollY+innerHeight/2,c=k=>mTops[k]+mH[k]/2;
+  let p;
+  if(y<=c(0))p=0;else if(y>=c(N-1))p=N-1;
+  else{let k=0;while(k<N-2&&y>c(k+1))k++;p=k+(y-c(k))/(c(k+1)-c(k));}
+  pos=p;cur=Math.round(p);
+  progEl.style.transform=`scaleX(${pos/(N-1)})`;
+}
+if(MOBILE){
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)activate(slides.indexOf(e.target));}),{threshold:.15});
+  slides.forEach(s=>io.observe(s));
+  setInterval(measureM,1500);
+}
 addEventListener('resize',layout);
 
 /* main loop */
@@ -1089,8 +1166,9 @@ function frame(now){
   if(dt>0&&dt<100){ema+=(dt-ema)*.05;
     if(ema>21){if(++slow>45&&RS>.6){RS=Math.max(.6,RS*.85);resizeGL();slow=0;}}else slow=0;
     if(ema<14.5&&RS<RS_MAX){if(++fast>300){RS=Math.min(RS_MAX,RS/.85);resizeGL();fast=0;}}else fast=0;}
-  if(tw){const k=Math.min(1,(now-tw.t0)/tw.dur);pos=tw.from+(tw.to-tw.from)*ease(k);if(k>=1){pos=tw.to;tw=null;}}
-  if(pos!==lastPos||S!==lastS){
+  if(MOBILE)mobilePos();
+  else if(tw){const k=Math.min(1,(now-tw.t0)/tw.dur);pos=tw.from+(tw.to-tw.from)*ease(k);if(k>=1){pos=tw.to;tw=null;}}
+  if(!MOBILE&&(pos!==lastPos||S!==lastS)){
     const H=innerHeight;
     for(let i=0;i<N;i++){
       const d=i-pos,s=slides[i];
@@ -1118,8 +1196,9 @@ function frame(now){
   smx+=(mx-smx)*.04;smy+=(my-smy)*.04;
   if(gl){
     gl.uniform2f(U.uRes,cv.width,cv.height);gl.uniform1f(U.uTime,now/1000);gl.uniform1f(U.uScroll,pos);
-    gl.uniform1f(U.uTheme,theme);gl.uniform1f(U.uShift,shift);gl.uniform1f(U.uDim,dm);gl.uniform2f(U.uMouse,smx,smy);
-    gl.uniform4f(U.uCalm,(ox+cr[0]*S)/innerWidth,(oy+cr[1]*S)/innerHeight,cr[2]*S/innerWidth,cr[3]*S/innerHeight);
+    gl.uniform1f(U.uTheme,theme);gl.uniform1f(U.uShift,shift);gl.uniform1f(U.uDim,MOBILE?dm*.6:dm);gl.uniform2f(U.uMouse,smx,smy);
+    if(MOBILE)gl.uniform4f(U.uCalm,0,0,0,0);
+    else gl.uniform4f(U.uCalm,(ox+cr[0]*S)/innerWidth,(oy+cr[1]*S)/innerHeight,cr[2]*S/innerWidth,cr[3]*S/innerHeight);
     gl.drawArrays(gl.TRIANGLES,0,3);
   }
   requestAnimationFrame(frame);
@@ -1135,6 +1214,7 @@ pos=cur=startIdx;
 requestAnimationFrame(frame);
 (document.fonts?document.fonts.ready:Promise.resolve()).then(()=>{
   applyGlass();
+  if(MOBILE){measureM();if(startIdx>0)scrollTo(0,slides[startIdx].offsetTop);}
   setTimeout(()=>{activate(cur);if(cur===0)setTimeout(()=>hint.classList.add('show'),2600);},150);
 });
 })();
