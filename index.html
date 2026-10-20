@@ -915,22 +915,24 @@ uniform vec2 uRes;uniform float uTime,uScroll,uTheme,uShift,uDim;uniform vec2 uM
 out vec4 o;
 mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-// A changing polar outline keeps the glass sculpture organic as it turns.
-float form(vec2 p,float t){
+// Three differently shaped sculptures travel across the stage on staggered paths.
+float form(vec2 p,float t,float id){
  float a=atan(p.y,p.x),r=length(p);
- float edge=.37+.060*sin(3.*a+t*.19)+.046*sin(5.*a-t*.14+1.5)
-            +.021*sin(9.*a+t*.31)+.016*sin(13.*a-t*.23);
+ float edge=.31+.035*id+.055*sin((3.+id)*a+t*.19+id*1.7)
+            +.038*sin((5.+id)*a-t*.14+1.5+id)
+            +.020*sin(9.*a+t*.31+id*2.1);
  return r-edge;
 }
-vec3 glass(vec2 p,float t,float d){
+vec3 glass(vec2 p,float t,float d,float id){
  float a=atan(p.y,p.x),r=length(p);
- float curl=p.x*17.-p.y*8.+3.4*sin(p.y*7.+p.x*4.+t*.24)
-            +1.5*sin(a*2.+r*8.);
+ float curl=p.x*(17.-id*2.)-p.y*(8.+id*2.)
+            +3.4*sin(p.y*(7.+id)+p.x*4.+t*.24+id*2.)
+            +1.5*sin(a*2.+r*8.+id);
  float fold=.5+.5*sin(curl);
  float fine=.5+.5*sin(curl*2.4-r*14.);
  vec3 violet=vec3(.20,.055,.83),blue=vec3(.18,.27,1.);
  vec3 pink=vec3(1.,.15,.72),pearl=vec3(.91,.72,1.);
- vec3 col=mix(violet,blue,smoothstep(.12,.85,fold));
+ vec3 col=mix(violet,blue,smoothstep(.12,.85,fold+id*.08));
  col=mix(col,pink,smoothstep(.52,.98,fine)*.75);
  col=mix(col,pearl,pow(fold,14.)*.85);
  float ridge=pow(max(0.,sin(curl*1.8+1.2)),28.);
@@ -945,14 +947,6 @@ void main(){
  vec2 fc=gl_FragCoord.xy;
  vec2 p=(fc-.5*uRes)/uRes.y+uMouse*.012;
  float t=uTime;
- vec2 center=vec2(uShift*.43+.045*sin(t*.22+uScroll*.6),
-                  .025+.055*sin(t*.16-uScroll*.45));
- vec2 q=rot(t*.12+uScroll*.22)*(p-center);
- q.x*=.91;
- float d=form(q,t);
- float mask=1.-smoothstep(-.012,.012,d);
- float halo=exp(-max(d,0.)*7.5);
- float aura=exp(-max(d,0.)*3.8);
  // The existing per-slide calm rectangle protects headings and dense copy.
  vec2 uv=vec2(fc.x/uRes.x,1.-fc.y/uRes.y);
  vec2 hs=uCalm.zw*.5;vec2 cd=abs(uv-(uCalm.xy+hs))-hs;cd.x*=uRes.x/uRes.y;
@@ -960,17 +954,31 @@ void main(){
  float att=1.-(1.-smoothstep(-.03,.18,sd))*.86*step(.001,uCalm.z);
  float strength=uDim*att;
  vec3 dark=vec3(.008,.004,.021);
- dark+=vec3(.075,.013,.16)*exp(-length(p-center)*2.5);
- dark+=vec3(.20,.015,.37)*pow(aura,2.)*.45*strength;
- dark+=vec3(.25,.025,.55)*pow(halo,3.)*.48*strength;
  vec3 light=mix(vec3(.98,.977,.992),vec3(.94,.935,.97),clamp(length(p)*.7,0.,1.));
- light-=vec3(.035,.035,.02)*pow(aura,2.)*strength;
- light+=vec3(.025,.005,.055)*pow(halo,3.)*strength;
- vec3 bg=mix(dark,light,uTheme);
- vec3 surface=glass(q,t,d);
- surface=mix(surface,mix(surface,vec3(1.),.18),uTheme);
- vec3 c=mix(bg,surface,mask*strength*(1.-uTheme*.23));
- c+=vec3(.22,.09,.42)*exp(-abs(d)*36.)*(1.-mask)*strength*(1.-uTheme*.65);
+ vec3 c=mix(dark,light,uTheme);
+ for(int i=0;i<3;i++){
+  float id=float(i);
+  float offset=i==0?.30:(i==1?.10:.45);
+  float phase=fract(t/32.+offset+uScroll*.09);
+  float direction=i==1?1.:-1.;
+  float x=direction*mix(-1.4,1.4,phase)+uShift*.16;
+  float y=(i==0?.08:(i==1?-.22:.24))+.055*sin(t*.18+id*2.4);
+  vec2 center=vec2(x,y);
+  float size=i==0?1.08:(i==1?.86:.74);
+  vec2 q=rot((i==1?-.13:.12)*t+id*1.7+uScroll*.12)*(p-center)/size;
+  q.x*=i==1?1.12:(i==2?.82:.91);
+  float d=form(q,t,id*.45);
+  float mask=1.-smoothstep(-.012,.012,d);
+  float halo=exp(-max(d,0.)*7.5);
+  float aura=exp(-max(d,0.)*3.8);
+  vec3 bloom=vec3(.24,.025,.52)*pow(aura,2.)*.32
+             +vec3(.27,.06,.7)*pow(halo,3.)*.45;
+  c+=mix(bloom,bloom*.18,uTheme)*strength;
+  vec3 surface=glass(q,t,d,id);
+  surface=mix(surface,mix(surface,vec3(1.),.18),uTheme);
+  c=mix(c,surface,mask*strength*(1.-uTheme*.23));
+  c+=vec3(.22,.09,.42)*exp(-abs(d)*36.)*(1.-mask)*strength*(1.-uTheme*.65);
+ }
  c+=(hash(fc+fract(uTime)*100.)-.5)/255.*1.5;
  o=vec4(c,1.);
 }`;
@@ -1171,7 +1179,7 @@ function frame(now){
   smx+=(mx-smx)*.04;smy+=(my-smy)*.04;
   if(gl){
     gl.uniform2f(U.uRes,cv.width,cv.height);gl.uniform1f(U.uTime,now/1000);gl.uniform1f(U.uScroll,pos);
-    gl.uniform1f(U.uTheme,theme);gl.uniform1f(U.uShift,shift);gl.uniform1f(U.uDim,MOBILE?dm*.6:dm);gl.uniform2f(U.uMouse,smx,smy);
+    gl.uniform1f(U.uTheme,theme);gl.uniform1f(U.uShift,shift);gl.uniform1f(U.uDim,MOBILE?dm*.38:dm);gl.uniform2f(U.uMouse,smx,smy);
     if(MOBILE)gl.uniform4f(U.uCalm,0,0,0,0);
     else gl.uniform4f(U.uCalm,(ox+cr[0]*S)/innerWidth,(oy+cr[1]*S)/innerHeight,cr[2]*S/innerWidth,cr[3]*S/innerHeight);
     gl.drawArrays(gl.TRIANGLES,0,3);
