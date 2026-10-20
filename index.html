@@ -903,7 +903,7 @@ body.lt.m #count{background:rgba(255,255,255,.65);color:#1d1d1f}
 const MOBILE=matchMedia('(hover: none) and (pointer: coarse) and (max-width: 1000px)').matches||/[?&]mobile/.test(location.search);
 if(MOBILE){document.documentElement.classList.add('m');document.body.classList.add('m');}
 /* =====================================================================
-   1. LIQUID GLASS BACKGROUND — WebGL2 fragment shader
+   1. REFERENCE GLASS BACKGROUND — layered transparent artwork
    ===================================================================== */
 const cv=document.getElementById('bg');
 const gl=cv.getContext('webgl2',{antialias:false,alpha:false,premultipliedAlpha:false,powerPreference:'high-performance'});
@@ -912,73 +912,41 @@ in vec2 p;void main(){gl_Position=vec4(p,0.,1.);}`;
 const FS=`#version 300 es
 precision highp float;
 uniform vec2 uRes;uniform float uTime,uScroll,uTheme,uShift,uDim;uniform vec2 uMouse;uniform vec4 uCalm;
+uniform sampler2D uHero,uCurl,uLoop;
 out vec4 o;
 mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-// Three differently shaped sculptures travel across the stage on staggered paths.
-float form(vec2 p,float t,float id){
- float a=atan(p.y,p.x),r=length(p);
- float edge=.31+.035*id+.055*sin((3.+id)*a+t*.19+id*1.7)
-            +.038*sin((5.+id)*a-t*.14+1.5+id)
-            +.020*sin(9.*a+t*.31+id*2.1);
- return r-edge;
-}
-vec3 glass(vec2 p,float t,float d,float id){
- float a=atan(p.y,p.x),r=length(p);
- float curl=p.x*(17.-id*2.)-p.y*(8.+id*2.)
-            +3.4*sin(p.y*(7.+id)+p.x*4.+t*.24+id*2.)
-            +1.5*sin(a*2.+r*8.+id);
- float fold=.5+.5*sin(curl);
- float fine=.5+.5*sin(curl*2.4-r*14.);
- vec3 violet=vec3(.20,.055,.83),blue=vec3(.18,.27,1.);
- vec3 pink=vec3(1.,.15,.72),pearl=vec3(.91,.72,1.);
- vec3 col=mix(violet,blue,smoothstep(.12,.85,fold+id*.08));
- col=mix(col,pink,smoothstep(.52,.98,fine)*.75);
- col=mix(col,pearl,pow(fold,14.)*.85);
- float ridge=pow(max(0.,sin(curl*1.8+1.2)),28.);
- float rim=exp(-abs(d)*95.);
- float inner=exp(-abs(d+.042)*95.);
- col+=vec3(.8,.52,1.)*ridge*.45;
- col+=vec3(.75,.75,1.)*rim*1.25+vec3(1.,.14,.62)*inner*.55;
- col*=.60+.55*smoothstep(.0,.25,-d);
- return col;
+vec4 art(sampler2D tex,vec2 p,vec2 center,float h,float ratio,float angle){
+ vec2 q=rot(-angle)*(p-center);
+ vec2 uv=vec2(q.x/(h*ratio)+.5,q.y/h+.5);
+ vec2 inBounds=step(vec2(0.),uv)*step(uv,vec2(1.));
+ return texture(tex,uv)*inBounds.x*inBounds.y;
 }
 void main(){
  vec2 fc=gl_FragCoord.xy;
  vec2 p=(fc-.5*uRes)/uRes.y+uMouse*.012;
  float t=uTime;
- // The existing per-slide calm rectangle protects headings and dense copy.
  vec2 uv=vec2(fc.x/uRes.x,1.-fc.y/uRes.y);
  vec2 hs=uCalm.zw*.5;vec2 cd=abs(uv-(uCalm.xy+hs))-hs;cd.x*=uRes.x/uRes.y;
  float sd=length(max(cd,0.))+min(max(cd.x,cd.y),0.);
  float att=1.-(1.-smoothstep(-.03,.18,sd))*.86*step(.001,uCalm.z);
- float strength=uDim*att;
- vec3 dark=vec3(.008,.004,.021);
+ float strength=uDim*att*mix(1.,.27,uTheme);
+ vec3 dark=vec3(.005,.002,.014);
  vec3 light=mix(vec3(.98,.977,.992),vec3(.94,.935,.97),clamp(length(p)*.7,0.,1.));
  vec3 c=mix(dark,light,uTheme);
- for(int i=0;i<3;i++){
-  float id=float(i);
-  float offset=i==0?.30:(i==1?.10:.45);
-  float phase=fract(t/32.+offset+uScroll*.09);
-  float direction=i==1?1.:-1.;
-  float x=direction*mix(-1.4,1.4,phase)+uShift*.16;
-  float y=(i==0?.08:(i==1?-.22:.24))+.055*sin(t*.18+id*2.4);
-  vec2 center=vec2(x,y);
-  float size=i==0?1.08:(i==1?.86:.74);
-  vec2 q=rot((i==1?-.13:.12)*t+id*1.7+uScroll*.12)*(p-center)/size;
-  q.x*=i==1?1.12:(i==2?.82:.91);
-  float d=form(q,t,id*.45);
-  float mask=1.-smoothstep(-.012,.012,d);
-  float halo=exp(-max(d,0.)*7.5);
-  float aura=exp(-max(d,0.)*3.8);
-  vec3 bloom=vec3(.24,.025,.52)*pow(aura,2.)*.32
-             +vec3(.27,.06,.7)*pow(halo,3.)*.45;
-  c+=mix(bloom,bloom*.18,uTheme)*strength;
-  vec3 surface=glass(q,t,d,id);
-  surface=mix(surface,mix(surface,vec3(1.),.18),uTheme);
-  c=mix(c,surface,mask*strength*(1.-uTheme*.23));
-  c+=vec3(.22,.09,.42)*exp(-abs(d)*36.)*(1.-mask)*strength*(1.-uTheme*.65);
- }
+ float ph0=fract(t/40.+.30+uScroll*.035);
+ float ph1=fract(t/40.+.95+uScroll*.035);
+ float ph2=fract(t/40.+.95+uScroll*.035);
+ vec2 c0=vec2(mix(1.35,-1.35,ph0)+uShift*.10,.09+.04*sin(t*.15));
+ vec2 c1=vec2(mix(-1.35,1.35,ph1)+uShift*.10,-.05+.06*sin(t*.12+1.));
+ vec2 c2=vec2(mix(1.35,-1.35,ph2)+uShift*.10,-.18+.04*sin(t*.17+2.));
+ vec4 a0=art(uHero,p,c0,.68,1.50,-.10+.12*sin(t*.14));
+ vec4 a1=art(uCurl,p,c1,.72,.914,.16*sin(t*.11+1.));
+ vec4 a2=art(uLoop,p,c2,.56,1.11,-.12*sin(t*.13+2.));
+ c+=vec3(.055,.004,.10)*(a0.a+a1.a+a2.a)*strength*(1.-uTheme);
+ c=mix(c,a0.rgb,a0.a*strength);
+ c=mix(c,a1.rgb,a1.a*strength);
+ c=mix(c,a2.rgb,a2.a*strength);
  c+=(hash(fc+fract(uTime)*100.)-.5)/255.*1.5;
  o=vec4(c,1.);
 }`;
@@ -988,7 +956,21 @@ if(gl){
   prog=gl.createProgram();gl.attachShader(prog,sh(gl.VERTEX_SHADER,VS));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(prog);gl.useProgram(prog);
   const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
   const l=gl.getAttribLocation(prog,'p');gl.enableVertexAttribArray(l);gl.vertexAttribPointer(l,2,gl.FLOAT,false,0,0);
-  ['uRes','uTime','uScroll','uTheme','uShift','uDim','uMouse','uCalm'].forEach(k=>U[k]=gl.getUniformLocation(prog,k));
+  ['uRes','uTime','uScroll','uTheme','uShift','uDim','uMouse','uCalm','uHero','uCurl','uLoop'].forEach(k=>U[k]=gl.getUniformLocation(prog,k));
+  ['glass-hero.webp','glass-curl.webp','glass-loop.webp'].forEach((file,i)=>{
+    const tex=gl.createTexture();gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,tex);
+    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([0,0,0,0]));
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    const img=new Image();img.onload=()=>{
+      gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,tex);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
+      gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);
+    };img.src='assets/'+file;
+  });
+  gl.uniform1i(U.uHero,0);gl.uniform1i(U.uCurl,1);gl.uniform1i(U.uLoop,2);
 }
 const RS_MAX=Math.min(window.devicePixelRatio||1,1.5,2560/Math.max(1,innerWidth));
 let RS=RS_MAX; // render scale, lowered automatically if the GPU can't keep up
@@ -1144,6 +1126,7 @@ addEventListener('resize',layout);
 
 /* main loop */
 let lastThemeLight=null,lastCur=-1,lastPos=NaN,lastS=0,lastT=0,ema=16,slow=0,fast=0;
+const bgStart=performance.now();
 function frame(now){
   const dt=now-lastT;lastT=now;
   if(dt>0&&dt<100){ema+=(dt-ema)*.05;
@@ -1178,7 +1161,7 @@ function frame(now){
   if(lastCur!==cur){brandEl.style.opacity=cur===0?'0':'';dots.forEach((b,k)=>b.classList.toggle('cur',k===cur));countEl.innerHTML='<b>'+String(cur+1).padStart(2,'0')+'</b><span>/ '+N+'</span>';lastCur=cur;}
   smx+=(mx-smx)*.04;smy+=(my-smy)*.04;
   if(gl){
-    gl.uniform2f(U.uRes,cv.width,cv.height);gl.uniform1f(U.uTime,now/1000);gl.uniform1f(U.uScroll,pos);
+    gl.uniform2f(U.uRes,cv.width,cv.height);gl.uniform1f(U.uTime,(now-bgStart)/1000);gl.uniform1f(U.uScroll,pos);
     gl.uniform1f(U.uTheme,theme);gl.uniform1f(U.uShift,shift);gl.uniform1f(U.uDim,MOBILE?dm*.38:dm);gl.uniform2f(U.uMouse,smx,smy);
     if(MOBILE)gl.uniform4f(U.uCalm,0,0,0,0);
     else gl.uniform4f(U.uCalm,(ox+cr[0]*S)/innerWidth,(oy+cr[1]*S)/innerHeight,cr[2]*S/innerWidth,cr[3]*S/innerHeight);
