@@ -903,7 +903,7 @@ body.lt.m #count{background:rgba(255,255,255,.65);color:#1d1d1f}
 const MOBILE=matchMedia('(hover: none) and (pointer: coarse) and (max-width: 1000px)').matches||/[?&]mobile/.test(location.search);
 if(MOBILE){document.documentElement.classList.add('m');document.body.classList.add('m');}
 /* =====================================================================
-   1. LIQUID BACKGROUND — WebGL2 fragment shader
+   1. LIQUID GLASS BACKGROUND — WebGL2 fragment shader
    ===================================================================== */
 const cv=document.getElementById('bg');
 const gl=cv.getContext('webgl2',{antialias:false,alpha:false,premultipliedAlpha:false,powerPreference:'high-performance'});
@@ -913,89 +913,64 @@ const FS=`#version 300 es
 precision highp float;
 uniform vec2 uRes;uniform float uTime,uScroll,uTheme,uShift,uDim;uniform vec2 uMouse;uniform vec4 uCalm;
 out vec4 o;
-const vec3 L1=vec3(.4725,.6014,.6443);
-const vec3 L2=vec3(-.6823,-.4386,.5848);
-float hash(vec2 p){vec3 p3=fract(vec3(p.xyx)*.1031);p3+=dot(p3,p3.yzx+33.33);return fract((p3.x+p3.y)*p3.z);}
-float noise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);
- return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y);}
-float fbm(vec2 p){float s=0.,a=.5;mat2 m=mat2(1.6,1.2,-1.2,1.6);for(int i=0;i<3;i++){s+=a*noise(p);p=m*p;a*=.5;}return s/.875;}
-
-// main ribbon: rounded tube profile (finite slope at the edge -> no aliasing rim)
-float ribA(vec2 q,float t,float wx,out float glow){
- float cx=uShift+.42*sin(q.y*1.18+t*.11)+.16*sin(q.y*2.5-t*.15+1.3);
- float wd=.29+.11*sin(q.y*1.6+t*.08+2.);
- float s=(q.x-cx)/wd;
- float b=clamp(1.-s*s,0.,1.);
- float folds=.5+.5*cos(s*4.6+2.4*sin(q.y*1.9-t*.17)+wx*5.5);
- float h=b*(2.-b)*mix(.55,1.,folds);
- float holes=smoothstep(.6,.76,fbm(q*2.2+vec2(t*.03,-t*.024)+7.3));
- h*=1.-holes*smoothstep(0.,.45,b);
- float cx2=cx+(wd+.07)*sin(q.y*1.7-t*.12+.7);
- float wd2=.07+.025*sin(q.y*3.+t*.1);
- float s2=(q.x-cx2)/wd2;float b2=clamp(1.-s2*s2,0.,1.);
- h=max(h,b2*(2.-b2)*.8);
- glow=exp(-pow((q.x-cx)/(wd*2.),2.));
- return h;
+mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
+float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+// A changing polar outline keeps the glass sculpture organic as it turns.
+float form(vec2 p,float t){
+ float a=atan(p.y,p.x),r=length(p);
+ float edge=.37+.060*sin(3.*a+t*.19)+.046*sin(5.*a-t*.14+1.5)
+            +.021*sin(9.*a+t*.31)+.016*sin(13.*a-t*.23);
+ return r-edge;
 }
-// deep back layer: wider, slower, no holes
-float ribB(vec2 q,float t,float wx){
- float cx=uShift*.45-.12+.58*sin(q.y*.82+t*.06+2.2)+.13*sin(q.y*2.1+t*.1);
- float wd=.38+.13*sin(q.y*1.3-t*.05);
- float s=(q.x-cx)/wd;float b=clamp(1.-s*s,0.,1.);
- float folds=.5+.5*cos(s*3.4-1.8*sin(q.y*1.4+t*.13)+wx*3.);
- return b*(2.-b)*mix(.6,1.,folds);
-}
-vec3 iri(float t){
- vec3 c0=vec3(.09,.05,.50),c1=vec3(.27,.24,1.),c2=vec3(.56,.32,1.),c3=vec3(1.,.22,.78),c4=vec3(.55,.92,1.);
- vec3 c=mix(c0,c1,smoothstep(0.,.32,t));c=mix(c,c2,smoothstep(.32,.56,t));
- c=mix(c,c3,smoothstep(.58,.82,t));c=mix(c,c4,smoothstep(.9,1.15,t));return c;}
-void shade(vec3 n,float h,float hue,out vec3 cd,out vec3 cl){
- float diff=max(dot(n,L1),0.);
- float sp=pow(max(dot(reflect(-L1,n),vec3(0,0,1)),0.),70.);
- float sp2=pow(max(dot(reflect(-L2,n),vec3(0,0,1)),0.),16.);
- float fres=pow(max(1.-n.z,0.),1.4);
- vec3 col=iri(hue+h*.28+fres*1.05+n.x*.22-n.y*.1);
- cd=col*(.22+.95*diff)+vec3(.85,.95,1.)*sp*1.25+vec3(1.,.32,.85)*sp2*.5+vec3(1.,.25,.8)*fres*.3;
- cl=mix(col,vec3(1.),.4)*(.8+.28*diff)+vec3(1.)*sp*.85+vec3(1.,.6,.92)*sp2*.25;
+vec3 glass(vec2 p,float t,float d){
+ float a=atan(p.y,p.x),r=length(p);
+ float curl=p.x*17.-p.y*8.+3.4*sin(p.y*7.+p.x*4.+t*.24)
+            +1.5*sin(a*2.+r*8.);
+ float fold=.5+.5*sin(curl);
+ float fine=.5+.5*sin(curl*2.4-r*14.);
+ vec3 violet=vec3(.20,.055,.83),blue=vec3(.18,.27,1.);
+ vec3 pink=vec3(1.,.15,.72),pearl=vec3(.91,.72,1.);
+ vec3 col=mix(violet,blue,smoothstep(.12,.85,fold));
+ col=mix(col,pink,smoothstep(.52,.98,fine)*.75);
+ col=mix(col,pearl,pow(fold,14.)*.85);
+ float ridge=pow(max(0.,sin(curl*1.8+1.2)),28.);
+ float rim=exp(-abs(d)*95.);
+ float inner=exp(-abs(d+.042)*95.);
+ col+=vec3(.8,.52,1.)*ridge*.45;
+ col+=vec3(.75,.75,1.)*rim*1.25+vec3(1.,.14,.62)*inner*.55;
+ col*=.60+.55*smoothstep(.0,.25,-d);
+ return col;
 }
 void main(){
  vec2 fc=gl_FragCoord.xy;
- vec2 p0=(fc-.5*uRes)/uRes.y;
- vec2 p=p0+uMouse*.018;
- float a=-.42;p=mat2(cos(a),-sin(a),sin(a),cos(a))*p;
- p.y-=uScroll*.9;
- float t=uTime*1.15;
- vec2 w=vec2(fbm(p*.85+vec2(0.,t*.05)),fbm(p*.85+vec2(4.7,-t*.045)));
- vec2 q=p+(w-.5)*.4;
- float e=1.5/uRes.y;vec2 ex=vec2(e,0.),ey=vec2(0.,e);
- float g,gd;
- float hA=ribA(q,t,w.x,g),hAx=ribA(q+ex,t,w.x,gd),hAy=ribA(q+ey,t,w.x,gd);
- float hB=ribB(q,t,w.y),hBx=ribB(q+ex,t,w.y),hBy=ribB(q+ey,t,w.y);
- // calm zone: ribbon softly fades behind headings
+ vec2 p=(fc-.5*uRes)/uRes.y+uMouse*.012;
+ float t=uTime;
+ vec2 center=vec2(uShift*.43+.045*sin(t*.22+uScroll*.6),
+                  .025+.055*sin(t*.16-uScroll*.45));
+ vec2 q=rot(t*.12+uScroll*.22)*(p-center);
+ q.x*=.91;
+ float d=form(q,t);
+ float mask=1.-smoothstep(-.012,.012,d);
+ float halo=exp(-max(d,0.)*7.5);
+ float aura=exp(-max(d,0.)*3.8);
+ // The existing per-slide calm rectangle protects headings and dense copy.
  vec2 uv=vec2(fc.x/uRes.x,1.-fc.y/uRes.y);
- vec2 hs=uCalm.zw*.5;vec2 d=abs(uv-(uCalm.xy+hs))-hs;d.x*=uRes.x/uRes.y;
- float sd=length(max(d,0.))+min(max(d.x,d.y),0.);
- float att=1.-(1.-smoothstep(-.03,.17,sd))*.78*step(.001,uCalm.z);
- vec3 nA=normalize(vec3(-(hAx-hA)/e*.045,-(hAy-hA)/e*.045,1.));
- vec3 nB=normalize(vec3(-(hBx-hB)/e*.035,-(hBy-hB)/e*.035,1.));
- vec3 aD,aL,bD,bL;
- shade(nA,hA,.22,aD,aL);
- shade(nB,hB,.04,bD,bL);
- float mA=smoothstep(0.,.07,hA)*att;
- float mB=smoothstep(0.,.08,hB)*att;
- // dark
- vec3 dark=vec3(.22,.10,.6)*g*.14*att;
- dark=mix(dark,bD*.42,mB*.9);
- dark=mix(dark,aD,mA);
- dark*=uDim;
- dark+=vec3(.35,.14,.95)*pow(g,4.)*.07*uDim*att;
- dark*=1.-.32*dot(p0,p0);
- // light
- vec3 bgL=mix(vec3(.975,.975,.985),vec3(.93,.93,.96),clamp(length(p0)*.75,0.,1.));
- bgL*=1.-g*.045*uDim*att;
- vec3 light=mix(bgL,mix(bgL,bL,.55),mB*(.3+.5*uDim));
- light=mix(light,aL,mA*(.35+.6*uDim));
- vec3 c=mix(dark,light,uTheme);
+ vec2 hs=uCalm.zw*.5;vec2 cd=abs(uv-(uCalm.xy+hs))-hs;cd.x*=uRes.x/uRes.y;
+ float sd=length(max(cd,0.))+min(max(cd.x,cd.y),0.);
+ float att=1.-(1.-smoothstep(-.03,.18,sd))*.86*step(.001,uCalm.z);
+ float strength=uDim*att;
+ vec3 dark=vec3(.008,.004,.021);
+ dark+=vec3(.075,.013,.16)*exp(-length(p-center)*2.5);
+ dark+=vec3(.20,.015,.37)*pow(aura,2.)*.45*strength;
+ dark+=vec3(.25,.025,.55)*pow(halo,3.)*.48*strength;
+ vec3 light=mix(vec3(.98,.977,.992),vec3(.94,.935,.97),clamp(length(p)*.7,0.,1.));
+ light-=vec3(.035,.035,.02)*pow(aura,2.)*strength;
+ light+=vec3(.025,.005,.055)*pow(halo,3.)*strength;
+ vec3 bg=mix(dark,light,uTheme);
+ vec3 surface=glass(q,t,d);
+ surface=mix(surface,mix(surface,vec3(1.),.18),uTheme);
+ vec3 c=mix(bg,surface,mask*strength*(1.-uTheme*.23));
+ c+=vec3(.22,.09,.42)*exp(-abs(d)*36.)*(1.-mask)*strength*(1.-uTheme*.65);
  c+=(hash(fc+fract(uTime)*100.)-.5)/255.*1.5;
  o=vec4(c,1.);
 }`;
