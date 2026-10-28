@@ -1,32 +1,22 @@
-# Kion FinOps+ · DCAB
+# Kion FinOps+ · Design CAB
 
-Презентація до практичної роботи №2 (Design CAB) з курсу «Інформаційні технології організації бізнесу»: впровадження сервісу **Cloud FinOps & Governance** на базі Kion FinOps+.
+An English, 20-slide technical design presentation for the Cloud FinOps & Governance service. It covers the platform deployment, network, identity, cloud integrations, account lifecycle, allocation, governance and service handover.
 
-Поточна версія містить 20 слайдів і зосереджена на технічному дизайні: місці Kion у проєктному процесі, архітектурі розгортання, інтеграціях, видачі акаунтів, Cloud Rules, потоках даних, межах довіри та порядку впровадження. Бізнес-кейс, бюджет, ризики й календарний план наведені в окремій презентації.
+The original animated ribbon and embedded deployment, network and dataflow figures are retained. Business Case budgets and metric slides belong to the separate Business Case presentation.
 
-**Переглянути:** https://nazya-why.github.io/kion-finops-presentation/
+## Controls
 
-## Керування
+| Action | Input |
+| --- | --- |
+| Next slide | Right / Down arrow, PageDown, Space, scroll |
+| Previous slide | Left / Up arrow, PageUp |
+| First / last slide | Home / End |
+| Full screen | F |
+| Enlarge diagram | Select a diagram |
+| Close diagram | Escape |
 
-| Дія | Клавіші |
-|---|---|
-| Наступний слайд | ↓ → Пробіл PageDown, коліщатко миші |
-| Попередній слайд | ↑ ← PageUp |
-| Перший / останній | Home / End |
-| Повний екран | F (або F11) |
-| Збільшити діаграму | клік по діаграмі, Esc — закрити |
+Keyboard navigation responds immediately. Wheel navigation retains the original transition. On touch devices the deck becomes a vertical document, with keyboard controls also supported.
 
-## На телефоні
+## Implementation
 
-На сенсорних телефонах презентація автоматично перемикається на вертикальну сторінку: слайди йдуть один за одним, гортаються пальцем, з тим самим живим фоном. Діаграми відкриваються на весь екран по тапу. На комп'ютері нічого не змінюється.
-
-Закрита десктопна версія збережена тегом [`v1`](https://github.com/Nazya-Why/kion-finops-presentation/tree/v1).
-
-## Як зроблено
-
-Один самодостатній файл `index.html` без збірки:
-
-- живий фон — WebGL2-шейдер (рідка стрічка з переливами), темні й світлі слайди перетікають один в одного;
-- Liquid Glass — `backdrop-filter` з SVG-картою заломлення (повний ефект у Chrome / Edge);
-- плавний вертикальний перехід між слайдами з паралаксом і каскадною появою тексту;
-- шрифти Inter і Unbounded (Google Fonts).
+One self-contained index.html with embedded diagrams and a WebGL ribbon background. Typography uses the platform system font stack without a remote font dependency. All panels and tables share one CSS glass material; SVG displacement is disabled to avoid distorted panel edges. See DESIGN.md for the layout and material rules.
