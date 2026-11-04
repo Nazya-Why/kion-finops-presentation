@@ -20,7 +20,7 @@ Use a 1920 x 1080 stage, 96px side margins and 20px gaps. Equivalent panels in a
 
 ## Interaction
 
-Arrow keys, PageUp/PageDown, Home/End, Space, wheel and swipe control the deck. Slides scroll vertically, the wheel scrubs the movement and one gesture moves one slide at most. Moving from the cover to the second slide is a scroll-linked dive: the cover text flies apart, the camera enters the particle mass and dark space with filaments and network lines opens up. The bottom navigation jumps between sections and shows the current one. Diagrams support an enlarged view and Escape dismissal.
+Arrow keys, PageUp/PageDown, Home/End, Space, wheel and swipe control the deck. Transitions can be interrupted at any moment. The bottom navigation jumps between sections and shows the current one. Diagrams support an enlarged view and Escape dismissal.
 
 ## Diagrams
 
