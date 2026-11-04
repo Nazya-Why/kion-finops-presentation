@@ -135,14 +135,12 @@ dd{font-size:1.95rem;line-height:1.36;color:var(--ink-2)}
 .slot.has:active{transform:scale(.995)}
 
 /* ---------- cover and closing ---------- */
-.cover .stage{display:block;padding:0}
-.cover h1{font-size:23rem;font-weight:420;line-height:1;letter-spacing:-.052em;margin:0}
-.cover h1 span{position:absolute;display:block;white-space:nowrap}
-.w1{left:9rem;top:23.5rem}
-.w2{right:9.2rem;top:52rem}
-.cover .kicker{position:absolute;left:9.8rem;top:20rem}
-.lede{position:absolute;left:9.8rem;top:49.4rem;font-size:3rem;font-weight:450;letter-spacing:-.022em;color:var(--ink)}
-.creds{position:absolute;right:9.6rem;top:22.4rem;width:31rem;display:flex;flex-direction:column;gap:2.4rem}
+.cover .stage{justify-content:center;gap:0}
+.cover .kicker{margin-bottom:2.6rem}
+.cover h1{font-size:18.6rem;font-weight:420;line-height:.98;letter-spacing:-.05em;margin:0 0 0 -.06em}
+.cover h1 span{display:block;white-space:nowrap}
+.lede{margin-top:3.4rem;font-size:3.2rem;font-weight:450;letter-spacing:-.022em;color:var(--ink)}
+.creds{flex:none;display:flex;flex-direction:row;gap:6.4rem;width:fit-content;margin-top:5.2rem;padding-top:2.4rem;border-top:1px solid var(--line-2)}
 .creds dt{font-size:1.7rem;font-weight:500;color:var(--ink-3);letter-spacing:0}
 .creds dd{font-size:2.2rem;font-weight:500;color:var(--ink);letter-spacing:-.014em;margin-top:.2rem}
 .closing .stage{align-items:center;justify-content:flex-start;padding-top:19rem;text-align:center}
@@ -152,12 +150,12 @@ dd{font-size:1.95rem;line-height:1.36;color:var(--ink-2)}
 .closing .tags{font-size:2.3rem;letter-spacing:-.012em;color:var(--ink-2);margin-top:3.2rem}
 
 /* ---------- chrome ---------- */
-#brand,#count{position:fixed;top:3.6rem;font-size:1.7rem;font-weight:500;letter-spacing:-.006em;z-index:5;pointer-events:none}
-#brand{left:9.8rem;display:flex;align-items:center;gap:1rem}
+#brand,#count{position:fixed;top:calc(50% - 50.4rem);font-size:1.7rem;font-weight:500;letter-spacing:-.006em;z-index:5;pointer-events:none}
+#brand{left:calc(50% - 86.4rem);display:flex;align-items:center;gap:1rem}
 #brand i{width:.9rem;height:.9rem;border-radius:50%;background:var(--accent)}
-#count{right:9.6rem;font-variant-numeric:tabular-nums;color:var(--ink-3)}
+#count{right:calc(50% - 86.4rem);font-variant-numeric:tabular-nums;color:var(--ink-3)}
 #count b{font-weight:560;color:var(--ink)}
-#nav{position:fixed;left:50%;bottom:3rem;transform:translateX(-50%);z-index:5;display:flex;align-items:center;gap:.2rem;padding:.6rem;border-radius:99rem;background:rgba(14,22,18,.66);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);box-shadow:inset 0 0 0 1px var(--line),inset 0 1px 0 rgba(255,255,255,.08),0 1.6rem 4rem rgba(0,0,0,.35)}
+#nav{position:fixed;left:50%;bottom:calc(50% - 51rem);transform:translateX(-50%);z-index:5;display:flex;align-items:center;gap:.2rem;padding:.6rem;border-radius:99rem;background:rgba(14,22,18,.66);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);box-shadow:inset 0 0 0 1px var(--line),inset 0 1px 0 rgba(255,255,255,.08),0 1.6rem 4rem rgba(0,0,0,.35)}
 #nav button{position:relative;z-index:1;white-space:nowrap;height:4.2rem;border-radius:99rem;font-size:1.7rem;font-weight:500;letter-spacing:-.006em;color:var(--ink-2);padding:0 1.9rem;transition:color .25s ease}
 #nav button:hover{color:var(--ink)}
 #nav button:active{transform:scale(.97)}
@@ -215,7 +213,7 @@ dd{font-size:1.95rem;line-height:1.36;color:var(--ink-2)}
   .panel{padding:2rem 2.8rem}
   .cover .stage{display:flex;flex-direction:column;justify-content:center;min-height:100svh;padding:12rem max(16px,env(safe-area-inset-right,0px)) 10rem max(16px,env(safe-area-inset-left,0px));gap:2.4rem}
   .cover h1{font-size:13rem}
-  .cover h1 span,.cover .kicker,.lede,.creds{position:static}
+  .creds{flex-direction:column;gap:2.4rem}
   .creds{width:auto}
   .closing .stage{min-height:100svh;justify-content:center;padding-top:9rem}
   .closing h1{font-size:9rem}
@@ -871,7 +869,7 @@ void main(){
   vec2 q=p*vec2(1.5,2.1)+vec2(uT*.018,-uT*.012);
   float w=fbm(q*1.5+7.);
   float n=fbm(q+vec2(w*1.6,-w));
-  float l=exp(-abs(n-.5)*70.)*smoothstep(.35,.7,fbm(q*.8+3.))*smoothstep(-.42,.18,p.y);
+  float l=exp(-abs(n-.5)*70.)*smoothstep(.35,.7,fbm(q*.8+3.))*smoothstep(-.62,.02,p.y);
   c+=vec3(.1,.95,.16)*l*uFil*2.6;
   c+=vec3(.0,.06,.015)*smoothstep(.5,.85,fbm(q*.5-uT*.01))*uFil;
  }
@@ -879,20 +877,18 @@ void main(){
  if(uBeam>.01){
   float by=-.33,y=p.y-by,bx=p.x-uBeamX+.022*sin(p.y*5.+uT*1.5)+.01*sin(p.y*13.-uT*2.2);
   float w=.024+.012*sin(uT*.9+p.y*3.)+.2*exp(-max(y,0.)*8.5)+.03*max(y,0.);
-  float col=exp(-bx*bx/(w*w))*smoothstep(1.2,.2,y)*step(0.,y);
+  float col=exp(-bx*bx/(w*w))*smoothstep(1.2,.2,y)*smoothstep(-.05,.03,y);
   vec3 cc=mix(vec3(.03,.62,.01),vec3(.9,.92,.0),exp(-max(y,0.)*15.));
   c+=cc*col*2.1*uBeam;
-  float fl=exp(-max(y,0.)*34.)*exp(-bx*bx*6.5)*step(0.,y);
-  c+=vec3(.42,.92,.0)*fl*2.3*uBeam;
+  float fl=exp(-max(y,0.)*34.)*exp(-bx*bx*6.5)*smoothstep(-.05,.03,y);
+  c+=vec3(.36,.86,.02)*fl*1.5*uBeam;
  }
  /* mirrored flares at the top and bottom edges */
  if(uFlare>.01){
   for(int i=0;i<2;i++){
-   float sg=i==0?1.:-1.,y=(.5-sg*p.y)-.1;
-   float fx=exp(-p.x*p.x*(i==0?9.:13.));
-   float f=exp(-abs(y)*(y>0.?60.:24.))*fx*(y>0.?.0:1.);
-   float cone2=exp(-p.x*p.x/(.0025+max(-y,0.)*.11))*exp(-max(-y,0.)*12.)*step(y,0.);
-   c+=vec3(.4,.92,.0)*(f*1.5+cone2*1.5)*uFlare;
+   float y=.5-(i==0?p.y:-p.y);
+   float g=exp(-y*7.5)*exp(-p.x*p.x*4.5),core=exp(-y*20.)*exp(-p.x*p.x*16.);
+   c+=(vec3(.03,.42,.06)*g*.75+vec3(.2,.72,.06)*core*.55)*uFlare;
   }
  }
  c+=vec3(.015,.3,.08)*exp(-p.x*p.x*16.)*exp(-(p.y+.56)*(p.y+.56)*22.)*uFoot;
@@ -999,6 +995,7 @@ const GLOW=[0,0,0,0,0,0,0,1,1];
 const SPARSE=[0,0,0,0,0,0,0,0,1],SQUARE=[0,0,0,0,0,0,0,1,0];
 const SCENES={
   hero:{em:1,hot:1,lit:0,stars:.15,spin:.34,shapes:[TORN,FIN,ROCK,TORN,BALL,ROCK],spots:[[.04,.02],[.16,.04],[-.12,-.03],[.08,-.02]]},
+  cover:{em:1,fil:1,hot:1,lit:0,stars:.35,spin:.34,shapes:[TORN,FIN,ROCK,TORN,BALL,ROCK],spots:[[.25,.02],[.28,-.03],[.23,.04],[.27,0]]},
   void:{fil:1,stars:1,spin:.12,shapes:[DUST],spots:[[0,0]]},
   beam:{beam:1,bx:.07,stars:.55,spin:.16,shapes:[DUST],spots:[[0,0]]},
   flare:{beam:.5,bx:.1,flare:1,stars:.55,spin:.16,shapes:[DUST],spots:[[0,0]]},
@@ -1006,7 +1003,7 @@ const SCENES={
   moss:{swirl:1,lit:1,hot:.12,stars:.65,spin:.5,shapes:[BEANS,RING,LOOPS,BEANS],spots:[[.3,.1],[-.04,.14],[.36,-.08]]},
   close:{swirl:1,foot:1,lit:1,hot:.12,stars:.65,spin:.5,shapes:[RING,BEANS,LOOPS],spots:[[0,-.3],[-.04,-.31],[.04,-.3]]}
 };
-const SLIDE_SCENE=['hero','hero','helix','helix','void','beam','flare','moss','moss','void','hero','hero','flare','helix','helix','void','moss','moss','hero','close'];
+const SLIDE_SCENE=['cover','hero','helix','helix','void','beam','flare','moss','moss','void','hero','hero','flare','helix','helix','void','moss','moss','hero','close'];
 const keys=['em','hot','lit','stars','beam','bx','flare','swirl','fil','foot'];
 const now={em:1,hot:1,lit:0,stars:.2,beam:0,bx:0,flare:0,swirl:0,fil:0,foot:0,x:.04,y:.02,s:.33,kick:0,blast:0,mx:9,my:9,rot:0};
 let sceneName='hero',scene=SCENES.hero,order=0,spot=0,gx=.04,gy=.02;
