@@ -1,23 +1,27 @@
 # Kion FinOps+ presentation
 
-The original animated ribbon and architecture, network and dataflow figures define the visual identity. The deck contains 20 slides in English. The hierarchy-tree slide and Business Case budget/metric slides are excluded.
+A dark, all-green deck of 20 slides in English, with Apple-style typography over a constantly moving particle background. The hierarchy-tree slide and Business Case budget/metric slides are excluded.
 
 ## Typography
 
-Use the platform system font stack: SF Pro on Apple platforms and Segoe UI on Windows. Display titles use 76px type on a 1920 × 1080 stage, weight 700, line-height 1.05 and tracking -0.035em. Panel headings use 31px, body copy 24px and supporting copy 22px. Dense reference rows use 21px. Gradient emphasis belongs to the inherited display titles.
+SF Pro on Apple platforms and embedded Inter elsewhere. Sizes are set in rem on a 1920 x 1080 stage, where 1rem equals 10 stage pixels. Slide titles use 72px, weight 500, line-height 1.04 and tracking -0.034em, with the second line dimmed. Card headings use 28-30px, body copy 21-24px and supporting copy 19-20px. Key terms inside a paragraph are brightened.
+
+## Background
+
+Scenes change from slide to slide: a green-lit room with a moss-like particle mass, dark space with glowing filaments, a beam of light with flares, a dotted helix, and a silk vortex. The mass keeps tearing apart and regrouping into new shapes. A slide change blasts the particles outward and the pointer pushes them aside.
 
 ## Material
 
-All panels and tables share the same glass material: 20px backdrop blur, neutral saturation, translucent white tint, a soft shadow and a subtle rim. Light and dark slides use the corresponding inherited tint. No panel-specific opaque dark backgrounds, purple header fills or SVG displacement filters.
+Text outside large headings sits on frosted glass: 16px backdrop blur over a translucent dark green tint. The Start button uses liquid glass with rim refraction in Chromium browsers and frosted glass elsewhere. On slow hardware the glass becomes a near-solid surface.
 
 ## Layout
 
-Use a 1920 × 1080 stage, 130px side margins and 26px gaps. Equivalent panels in a row share width and height. Use a shared baseline for headings and paragraph starts. Keep content inside the stage and leave room for navigation. No decorative arrows, arbitrary chips or nested glass panels.
+Use a 1920 x 1080 stage, 96px side margins and 20px gaps. Equivalent panels in a row share width and height. Numbered markers appear only on real sequences. Keep content clear of the bottom navigation.
 
 ## Interaction
 
-Arrow keys, PageUp/PageDown, Home/End and Space control the deck. Keyboard changes are immediate; pointer and wheel navigation preserve the original transition. The document takes keyboard focus at startup. Mobile navigation updates the active slide before scrolling. Editable elements retain normal keyboard behavior. Diagrams support an enlarged view and Escape dismissal.
+Arrow keys, PageUp/PageDown, Home/End, Space, wheel and swipe control the deck. Transitions can be interrupted at any moment. The bottom navigation jumps between sections and shows the current one. Diagrams support an enlarged view and Escape dismissal.
 
-## Reference figures
+## Diagrams
 
-Retain the source compositions for the deployment, network and dataflow slides. Translate their surrounding text without changing the embedded diagrams.
+The deployment, network and dataflow slides hold empty slots. A slot fills itself when its file exists in the diagrams folder.

@@ -2,21 +2,26 @@
 
 An English, 20-slide technical design presentation for the Cloud FinOps & Governance service. It covers the platform deployment, network, identity, cloud integrations, account lifecycle, allocation, governance and service handover.
 
-The original animated ribbon and embedded deployment, network and dataflow figures are retained. Business Case budgets and metric slides belong to the separate Business Case presentation.
+The deployment, network and dataflow slides hold empty slots for the diagrams. Business Case budgets and metric slides belong to the separate Business Case presentation.
 
 ## Controls
 
 | Action | Input |
 | --- | --- |
-| Next slide | Right / Down arrow, PageDown, Space, scroll |
+| Next slide | Right / Down arrow, PageDown, Space, scroll, swipe |
 | Previous slide | Left / Up arrow, PageUp |
 | First / last slide | Home / End |
 | Full screen | F |
 | Enlarge diagram | Select a diagram |
 | Close diagram | Escape |
+| Jump to a section | Bottom navigation |
 
-Keyboard navigation responds immediately. Wheel navigation retains the original transition. On touch devices the deck becomes a vertical document, with keyboard controls also supported.
+Below 900px wide, or on very short screens, the deck becomes a single scrolling column.
+
+## Diagrams
+
+Save the files next to index.html as `diagrams/deployment.png`, `diagrams/network.png` and `diagrams/dataflow.png`. Each one appears in its slot automatically and enlarges on selection.
 
 ## Implementation
 
-One self-contained index.html with embedded diagrams and a WebGL ribbon background. Typography uses the platform system font stack without a remote font dependency. All panels and tables share one CSS glass material; SVG displacement is disabled to avoid distorted panel edges. See DESIGN.md for the layout and material rules.
+One self-contained index.html with embedded Inter font files. The animated background is written in WebGL2: particle shapes are generated in Web Workers and rendered with bloom. It reduces its quality on slower graphics hardware and respects the reduced-motion setting. See DESIGN.md for the design rules.
