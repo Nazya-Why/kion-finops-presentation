@@ -12,7 +12,7 @@ Scenes change from slide to slide: a green-lit room with a moss-like particle ma
 
 ## Material
 
-Text outside large headings sits on frosted glass: 16px backdrop blur over a translucent dark green tint. The Start button uses liquid glass with rim refraction in Chromium browsers and frosted glass elsewhere. On slow hardware the glass becomes a near-solid surface.
+Text outside large headings sits on frosted glass: 16px backdrop blur over a translucent dark green tint. On slow hardware the glass becomes a near-solid surface.
 
 ## Layout
 

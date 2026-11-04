@@ -135,16 +135,6 @@ dd{font-size:1.95rem;line-height:1.36;color:var(--ink-2)}
 .slot.has:active{transform:scale(.995)}
 
 /* ---------- cover and closing ---------- */
-/* liquid glass: the background bends at the rim (refraction is added in script where the browser supports it) */
-.pill{position:relative;isolation:isolate;display:inline-flex;align-items:center;gap:1.6rem;height:6.4rem;padding:0 1rem 0 2.8rem;border-radius:99rem;color:#fff;font-size:2rem;font-weight:560;letter-spacing:-.012em;text-shadow:0 .1rem .6rem rgba(0,20,8,.45);
-  background:rgba(255,255,255,.1);-webkit-backdrop-filter:blur(.5rem) saturate(170%) brightness(1.14);backdrop-filter:blur(.5rem) saturate(170%) brightness(1.14);
-  box-shadow:0 1.4rem 3.6rem rgba(0,0,0,.34),0 .2rem .7rem rgba(0,0,0,.22),inset 0 .15rem .25rem rgba(255,255,255,.42),inset 0 -.15rem .4rem rgba(255,255,255,.14),inset 0 0 1.8rem rgba(255,255,255,.1)}
-.pill::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:.14rem;pointer-events:none;background:linear-gradient(125deg,rgba(255,255,255,.95),rgba(255,255,255,.28) 26%,rgba(255,255,255,.05) 52%,rgba(255,255,255,.22) 76%,rgba(255,255,255,.8));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
-.pill::after{content:"";position:absolute;left:1.4rem;right:1.4rem;top:.45rem;height:44%;border-radius:99rem;pointer-events:none;z-index:-1;background:linear-gradient(rgba(255,255,255,.26),rgba(255,255,255,0))}
-.pill:hover{background:rgba(255,255,255,.15)}
-.on .pill:active{transform:scale(.97);transition:transform .12s ease-out}
-.pill i{position:relative;display:grid;place-items:center;width:4.6rem;height:4.6rem;border-radius:50%;background:rgba(164,240,106,.92);box-shadow:inset 0 .12rem .2rem rgba(255,255,255,.65),inset 0 -.2rem .5rem rgba(40,120,30,.35),0 .3rem 1rem rgba(0,0,0,.25)}
-.pill .ic{width:2.2rem;height:2.2rem;color:#07110c;stroke-width:1.8}
 .cover .stage{display:block;padding:0}
 .cover h1{font-size:23rem;font-weight:420;line-height:1;letter-spacing:-.052em;margin:0}
 .cover h1 span{position:absolute;display:block;white-space:nowrap}
@@ -152,7 +142,6 @@ dd{font-size:1.95rem;line-height:1.36;color:var(--ink-2)}
 .w2{right:9.2rem;top:52rem}
 .cover .kicker{position:absolute;left:9.8rem;top:20rem}
 .lede{position:absolute;left:9.8rem;top:49.4rem;font-size:3rem;font-weight:450;letter-spacing:-.022em;color:var(--ink)}
-.cover .pill{position:absolute;left:9.8rem;top:56.4rem}
 .creds{position:absolute;right:9.6rem;top:22.4rem;width:31rem;display:flex;flex-direction:column;gap:2.4rem}
 .creds dt{font-size:1.7rem;font-weight:500;color:var(--ink-3);letter-spacing:0}
 .creds dd{font-size:2.2rem;font-weight:500;color:var(--ink);letter-spacing:-.014em;margin-top:.2rem}
@@ -226,9 +215,8 @@ dd{font-size:1.95rem;line-height:1.36;color:var(--ink-2)}
   .panel{padding:2rem 2.8rem}
   .cover .stage{display:flex;flex-direction:column;justify-content:center;min-height:100svh;padding:12rem max(16px,env(safe-area-inset-right,0px)) 10rem max(16px,env(safe-area-inset-left,0px));gap:2.4rem}
   .cover h1{font-size:13rem}
-  .cover h1 span,.cover .kicker,.lede,.cover .pill,.creds{position:static}
+  .cover h1 span,.cover .kicker,.lede,.creds{position:static}
   .creds{width:auto}
-  .cover .pill{align-self:flex-start}
   .closing .stage{min-height:100svh;justify-content:center;padding-top:9rem}
   .closing h1{font-size:9rem}
   #brand{left:max(16px,env(safe-area-inset-left,0px));top:2rem}
@@ -253,7 +241,6 @@ dd{font-size:1.95rem;line-height:1.36;color:var(--ink-2)}
 <canvas id="bg" aria-hidden="true"></canvas>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs id="lgdefs"></defs>
   <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="m3 13 9 5 9-5"/><path d="m3 17.5 9 5 9-5" opacity=".5"/></symbol>
   <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 19h10.5a4.5 4.5 0 0 0 .6-8.96A6.5 6.5 0 0 0 5.6 9.3 4.9 4.9 0 0 0 7 19Z"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></symbol>
@@ -278,7 +265,6 @@ dd{font-size:1.95rem;line-height:1.36;color:var(--ink-2)}
   <p class="kicker r">Practical assignment 2 · Design CAB</p>
   <h1><span class="w1 r">Kion</span> <span class="w2 r">FinOps+</span></h1>
   <p class="lede r">Cloud FinOps &amp; Governance</p>
-  <button class="pill r" type="button" data-go="1">Start<i><svg class="ic"><use href="#i-arrow"/></svg></i></button>
   <dl class="creds r">
    <div><dt>Prepared by</dt><dd>Students of group KB-307</dd></div>
    <div><dt>Reviewed by</dt><dd>Y. V. Martseniuk</dd></div>
@@ -1232,7 +1218,6 @@ function mode(){
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){cur=slides.indexOf(e.target);show(cur);blast();}}),{rootMargin:'-45% 0px -45% 0px'});
 
 $('#prev').onclick=()=>go(cur-1);nextB.onclick=()=>go(cur+1);
-$$('[data-go]').forEach(b=>b.onclick=()=>go(+b.dataset.go));
 
 addEventListener('keydown',e=>{
   if(e.altKey||e.ctrlKey||e.metaKey||lb.open)return;
@@ -1276,44 +1261,6 @@ lb.addEventListener('click',e=>{
     lb.classList.toggle('zoom');
   }else lb.close();
 });
-
-/* =====================================================================
-   4. LIQUID GLASS — refraction at the rim of a control (Chromium only;
-      other browsers keep the frosted glass from the stylesheet)
-   ===================================================================== */
-function liquidGlass(el){
-  const chromium=/Chrome\//.test(navigator.userAgent)&&CSS.supports('backdrop-filter','url(#a)');
-  if(!chromium||flow.matches)return;
-  const defs=$('#lgdefs'),id='lg-'+Math.random().toString(36).slice(2);
-  const f=document.createElementNS('http://www.w3.org/2000/svg','filter');
-  f.id=id;f.setAttribute('filterUnits','userSpaceOnUse');f.setAttribute('primitiveUnits','userSpaceOnUse');f.setAttribute('color-interpolation-filters','sRGB');
-  defs.appendChild(f);
-  const build=()=>{
-    const w=el.offsetWidth,h=el.offsetHeight;if(!w||!h)return;
-    const W=Math.max(2,w),H=Math.max(2,h),r=H/2,bez=H*.42;
-    const c=document.createElement('canvas');c.width=W;c.height=H;
-    const ctx=c.getContext('2d'),im=ctx.createImageData(W,H),d=im.data;
-    for(let y=0;y<H;y++)for(let x=0;x<W;x++){
-      const px=x+.5-W/2,py=y+.5-H/2,qx=Math.abs(px)-(W/2-r),qy=Math.abs(py)-(H/2-r);
-      let nx,ny,dist;
-      if(qx>0&&qy>0){const L=Math.hypot(qx,qy)||1;dist=r-L;nx=qx/L;ny=qy/L;}
-      else if(qx>qy){dist=r-qx;nx=1;ny=0;}else{dist=r-qy;nx=0;ny=1;}
-      nx*=px<0?-1:1;ny*=py<0?-1:1;
-      let m=0;if(dist<bez){const t=1-Math.max(dist,0)/bez;m=t*t*(1.4-.4*t);}
-      const i=(y*W+x)*4;d[i]=128+nx*m*127;d[i+1]=128+ny*m*127;d[i+2]=128;d[i+3]=255;
-    }
-    ctx.putImageData(im,0,0);
-    for(const k of['x','y'])f.setAttribute(k,'0');f.setAttribute('width',W);f.setAttribute('height',H);
-    const blur=H*.05,sc=-H*1.05;
-    f.innerHTML=`<feGaussianBlur in="SourceGraphic" stdDeviation="${blur.toFixed(1)}" result="s"/><feImage href="${c.toDataURL()}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="none" result="m"/><feDisplacementMap in="s" in2="m" scale="${sc.toFixed(1)}" xChannelSelector="R" yChannelSelector="G"/>`;
-    const v=`url(#${id}) saturate(170%) brightness(1.14)`;
-    el.style.webkitBackdropFilter=v;el.style.backdropFilter=v;
-  };
-  build();
-  let tm;new ResizeObserver(()=>{clearTimeout(tm);tm=setTimeout(build,120);}).observe(el);
-  if(document.fonts)document.fonts.ready.then(build);
-}
-$$('.pill').forEach(liquidGlass);
 
 /* boot */
 cur=Math.max(0,Math.min(N-1,(parseInt(location.hash.slice(1))||1)-1));
